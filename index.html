@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RuralCare — Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --gold: #c9a84c; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  #landing {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; background: #0d0d1a; overflow: hidden;
+  }
+  #landing::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+    top: -100px; left: -100px; border-radius: 50%;
+    animation: pulse 6s ease-in-out infinite;
+  }
+  #landing::after {
+    content: ''; position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(116,198,157,0.12) 0%, transparent 70%);
+    bottom: -80px; right: -80px; border-radius: 50%;
+    animation: pulse 6s ease-in-out infinite 3s;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .landing-header {
+    text-align: center; margin-bottom: 70px;
+    position: relative; z-index: 2;
+    animation: fadeDown 0.8s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .landing-header .logo-symbol {
+    font-size: 48px; margin-bottom: 12px; display: block;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.6));
+  }
+  .landing-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    color: #fff; letter-spacing: -0.5px;
+  }
+  .landing-header h1 span { color: var(--gold); }
+  .landing-header p {
+    color: rgba(255,255,255,0.45); font-size: 1rem;
+    margin-top: 10px; font-weight: 300;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .role-cards {
+    display: flex; gap: 28px;
+    position: relative; z-index: 2;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .role-card {
+    width: 260px; padding: 44px 32px;
+    border-radius: 20px; cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .role-card.doctor-card {
+    background: linear-gradient(145deg, #16213e, #0f3460);
+    box-shadow: 0 0 40px rgba(233,69,96,0.1);
+  }
+  .role-card.patient-card {
+    background: linear-gradient(145deg, #1b4332, #2d6a4f);
+    box-shadow: 0 0 40px rgba(116,198,157,0.1);
+  }
+  .role-card::before {
+    content: ''; position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.5s ease;
+  }
+  .role-card:hover::before { left: 100%; }
+  .role-card:hover { transform: translateY(-10px); }
+  .role-card.doctor-card:hover  { box-shadow: 0 20px 60px rgba(233,69,96,0.3); }
+  .role-card.patient-card:hover { box-shadow: 0 20px 60px rgba(116,198,157,0.3); }
+
+  .role-icon { font-size: 52px; margin-bottom: 20px; display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+  .role-card h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: #fff; margin-bottom: 10px; }
+  .role-card p  { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.6; font-weight: 300; }
+
+  .role-card .card-badge {
+    display: inline-block; margin-top: 24px;
+    padding: 7px 18px; border-radius: 50px;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .doctor-card .card-badge  { background: rgba(233,69,96,0.15); color: #e94560; border: 1px solid rgba(233,69,96,0.3); }
+  .patient-card .card-badge { background: rgba(116,198,157,0.15); color: #74c69d; border: 1px solid rgba(116,198,157,0.3); }
+
+  .role-card .arrow {
+    position: absolute; bottom: 20px; right: 24px;
+    font-size: 1.4rem; opacity: 0;
+    transform: translateX(-10px); transition: all 0.3s ease;
+  }
+  .role-card:hover .arrow { opacity: 1; transform: translateX(0); }
+
+  /* ── MODAL ── */
+  .login-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  .login-overlay.active { display: flex; }
+
+  .login-box {
+    width: 420px; border-radius: 24px; overflow: hidden;
+    animation: boxIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    position: relative;
+  }
+  @keyframes boxIn {
+    from { opacity: 0; transform: scale(0.85) translateY(30px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .login-header { padding: 36px 40px 28px; display: flex; align-items: center; gap: 16px; }
+  .doctor-login .login-header  { background: linear-gradient(135deg, #16213e, #0f3460); }
+  .patient-login .login-header { background: linear-gradient(135deg, #1b4332, #2d6a4f); }
+  .login-header .lh-icon { font-size: 36px; }
+  .login-header h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; }
+  .login-header p  { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  .login-body { padding: 36px 40px 40px; background: #fff; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block; font-size: 0.78rem; font-weight: 500;
+    color: #555; margin-bottom: 7px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .form-group input {
+    width: 100%; padding: 13px 16px;
+    border-radius: 10px; border: 1.5px solid #e8e8e8;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    color: #1a1a2e; background: #fafafa;
+    transition: border-color 0.25s, box-shadow 0.25s; outline: none;
+  }
+  .doctor-login .form-group input:focus  { border-color: #e94560; box-shadow: 0 0 0 3px rgba(233,69,96,0.1); background: #fff; }
+  .patient-login .form-group input:focus { border-color: #2d6a4f; box-shadow: 0 0 0 3px rgba(45,106,79,0.1);  background: #fff; }
+
+  .error-msg {
+    display: none; font-size: 0.8rem; color: #e94560;
+    margin-top: -10px; margin-bottom: 14px;
+    padding: 8px 12px; background: rgba(233,69,96,0.07); border-radius: 7px;
+  }
+  .error-msg.show { display: block; }
+
+  .login-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: all 0.3s ease; margin-top: 4px; letter-spacing: 0.5px;
+  }
+  .doctor-login .login-btn  { background: linear-gradient(135deg, #e94560, #c0392b); color: #fff; box-shadow: 0 6px 20px rgba(233,69,96,0.3); }
+  .doctor-login .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(233,69,96,0.4); }
+  .patient-login .login-btn { background: linear-gradient(135deg, #2d6a4f, #1b4332); color: #fff; box-shadow: 0 6px 20px rgba(45,106,79,0.3); }
+  .patient-login .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(45,106,79,0.4); }
+
+  .close-btn {
+    position: absolute; top: 14px; right: 16px;
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .close-btn:hover { background: rgba(255,255,255,0.25); }
+
+  @media (max-width: 700px) {
+    .role-cards { flex-direction: column; align-items: center; }
+    .login-box  { width: 94vw; }
+    .login-body    { padding: 28px 24px; }
+    .login-header  { padding: 28px 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="landing-header">
+    <span class="logo-symbol">⚕️</span>
+    <h1>Rural<span>Care</span></h1>
+    <p>Telemedicine Portal — Select Your Role</p>
+  </div>
+
+  <div class="role-cards">
+    <div class="role-card doctor-card" onclick="openLogin('doctor')">
+      <span class="role-icon">🩺</span>
+      <h2>Doctor</h2>
+      <p>Access patient records, manage appointments, and review medical histories.</p>
+      <span class="card-badge">Medical Staff</span>
+      <span class="arrow">→</span>
+    </div>
+
+    <div class="role-card patient-card" onclick="openLogin('patient')">
+      <span class="role-icon">🧑</span>
+      <h2>Patient</h2>
+      <p>Book consultations, view prescriptions, and track your health records.</p>
+      <span class="card-badge">Patient Portal</span>
+      <span class="arrow">→</span>
+    </div>
+  </div>
+</div>
+
+<!-- DOCTOR LOGIN MODAL -->
+<div class="login-overlay" id="doctorOverlay">
+  <div class="login-box doctor-login">
+    <button class="close-btn" onclick="closeLogin('doctor')">✕</button>
+    <div class="login-header">
+      <span class="lh-icon">🩺</span>
+      <div><h3>Doctor Login</h3><p>Medical Staff Access</p></div>
+    </div>
+    <div class="login-body">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="docUser" placeholder="Enter your username" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="docPass" placeholder="Enter your password">
+      </div>
+      <div class="error-msg" id="docError">❌ Invalid username or password. Please try again.</div>
+      <button class="login-btn" onclick="doLogin('doctor')">Sign In to Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATIENT LOGIN MODAL -->
+<div class="login-overlay" id="patientOverlay">
+  <div class="login-box patient-login">
+    <button class="close-btn" onclick="closeLogin('patient')">✕</button>
+    <div class="login-header">
+      <span class="lh-icon">🧑‍⚕️</span>
+      <div><h3>Patient Login</h3><p>Personal Health Portal</p></div>
+    </div>
+    <div class="login-body">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="patUser" placeholder="Enter your username" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="patPass" placeholder="Enter your password">
+      </div>
+      <div class="error-msg" id="patError">❌ Invalid username or password. Please try again.</div>
+      <button class="login-btn" onclick="doLogin('patient')">Sign In to Portal →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── SET YOUR CREDENTIALS HERE ──
+  const CREDENTIALS = {
+    doctor:  { username: 'rajesh',  password: 'doctor123' },
+    patient: { username: 'priya',  password: 'patient123' }
+  };
+
+  function openLogin(role) {
+    document.getElementById(role + 'Overlay').classList.add('active');
+    const u = role === 'doctor' ? 'docUser' : 'patUser';
+    const p = role === 'doctor' ? 'docPass' : 'patPass';
+    const e = role === 'doctor' ? 'docError' : 'patError';
+    document.getElementById(u).value = '';
+    document.getElementById(p).value = '';
+    document.getElementById(e).classList.remove('show');
+    setTimeout(() => document.getElementById(u).focus(), 200);
+  }
+
+  function closeLogin(role) {
+    document.getElementById(role + 'Overlay').classList.remove('active');
+  }
+
+  document.getElementById('doctorOverlay').addEventListener('click', function(e) { if (e.target === this) closeLogin('doctor'); });
+  document.getElementById('patientOverlay').addEventListener('click', function(e) { if (e.target === this) closeLogin('patient'); });
+
+  function doLogin(role) {
+    const isDoc  = role === 'doctor';
+    const username = document.getElementById(isDoc ? 'docUser' : 'patUser').value.trim();
+    const password = document.getElementById(isDoc ? 'docPass' : 'patPass').value.trim();
+    const errorEl  = document.getElementById(isDoc ? 'docError' : 'patError');
+
+    if (username === CREDENTIALS[role].username && password === CREDENTIALS[role].password) {
+      errorEl.classList.remove('show');
+      // ── REDIRECT ──
+      window.location.href = role === 'doctor' ? 'doctor_overview.html' : 'patient_overview.html';
+    } else {
+      errorEl.classList.add('show');
+    }
+  }
+
+  ['docUser','docPass'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doLogin('doctor'); }));
+  ['patUser','patPass'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doLogin('patient'); }));
+</script>
+</body>
+</html>
