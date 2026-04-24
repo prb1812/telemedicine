@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment – RuralCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+body { background: #f1f5f9; overflow: hidden; height: 100vh; }
+.layout { display: flex; height: 100vh; }
+.sidebar {
+  width: 260px; background: #0f172a; color: #94a3b8;
+  padding: 20px 14px; height: 100vh; overflow-y: auto;
+  flex-shrink: 0; display: flex; flex-direction: column;
+}
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.logo-plus {
+  width: 36px; height: 36px; background: #ff7a18; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: white;
+}
+.logo h2 { font-size: 15px; font-weight: 700; color: white; }
+.logo p  { font-size: 9px; color: #64748b; letter-spacing: 1px; }
+.sec-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: #475569; margin: 16px 0 8px 4px; }
+.roles { display: flex; gap: 8px; margin-bottom: 2px; }
+.role-card { flex: 1; background: #1e293b; border-radius: 12px; padding: 10px 8px; text-align: center; cursor: pointer; color: #94a3b8; }
+.role-card.active { background: #ff7a18; color: white; }
+.role-card .ri { font-size: 20px; display: block; margin-bottom: 4px; }
+.role-card .rl { font-size: 12px; font-weight: 600; display: block; }
+.role-card .rs { font-size: 10px; opacity: 0.75; display: block; margin-top: 2px; }
+.profile { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; padding: 8px 6px; }
+.profile-av {
+  width: 36px; height: 36px; border-radius: 50%; background: #ff7a18;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px; color: white; flex-shrink: 0;
+}
+.profile h4 { font-size: 13px; font-weight: 600; color: white; }
+.profile p  { font-size: 11px; color: #ff7a18; }
+.menu { list-style: none; }
+.menu li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; color: #64748b; margin-bottom: 1px; transition: all 0.15s;
+}
+.menu li:hover { background: #1e293b; color: #cbd5e1; }
+.menu li.active { background: #1e293b; color: white; border-left: 3px solid white; padding-left: 7px; }
+.menu li .mi { font-size: 14px; width: 18px; }
+.menu li a { color: inherit; text-decoration: none; display: block; }
+.main { flex: 1; padding: 32px 36px; overflow-y: auto; background: #f1f5f9; }
+.main h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+.subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 22px; }
+.symptom-banner {
+  display: none; background: #fff8f0; border: 1.5px solid #fddbb4;
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
+  font-size: 13px; color: #92400e;
+}
+.symptom-banner .sb-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; color: #c2410c; }
+.symptom-banner .sb-row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 4px; }
+.symptom-banner .sb-item { display: flex; flex-direction: column; gap: 2px; }
+.symptom-banner .sb-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #d97706; text-transform: uppercase; }
+.symptom-banner .sb-val   { font-size: 13px; color: #0f172a; font-weight: 500; }
+.content { display: flex; gap: 20px; align-items: flex-start; }
+.cal-card {
+  flex: 1; background: white; border-radius: 16px;
+  padding: 24px 28px; box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.cal-head h3 { font-size: 19px; font-weight: 700; color: #0f172a; }
+.nav-btns { display: flex; gap: 6px; }
+.nav-btns button {
+  width: 30px; height: 30px; border: 1px solid #e2e8f0; background: white;
+  border-radius: 7px; cursor: pointer; font-size: 15px; color: #64748b;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-btns button:hover { background: #f8fafc; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0; column-gap: 0; }
+.day-hdr { text-align: center; font-size: 11px; font-weight: 600; color: #94a3b8; padding: 6px 0 14px; letter-spacing: 0.5px; }
+.dc {
+  text-align: center; padding: 10px 0 20px; font-size: 14px; color: #475569;
+  cursor: pointer; position: relative; border-radius: 8px; transition: background 0.1s;
+}
+.dc:hover { color: #0f172a; }
+.dc.empty { cursor: default; }
+.dc.empty:hover { background: none; }
+.dc.dot::after {
+  content: ''; width: 5px; height: 5px; border-radius: 50%; background: #ff7a18;
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+}
+.dc.selected { background: #fff3e8; color: #ff7a18 !important; font-weight: 700; border-radius: 10px; }
+.dc.selected::after { background: #ff7a18; }
+.cal-bottom-msg {
+  font-size: 11px; font-weight: 600; color: #94a3b8; letter-spacing: 1px;
+  text-transform: uppercase; text-align: center; padding-top: 14px; border-top: 1px solid #f1f5f9;
+}
+.slots-wrap { padding-top: 16px; border-top: 1px solid #f1f5f9; display: none; }
+.slots-wrap p { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+.slot-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.slot-btn {
+  padding: 7px 16px; border: 1.5px solid #e2e8f0; border-radius: 20px;
+  background: white; font-size: 13px; color: #475569; cursor: pointer; font-weight: 500; transition: all 0.15s;
+}
+.slot-btn:hover { border-color: #ff7a18; color: #ff7a18; }
+.slot-btn.active { background: #ff7a18; border-color: #ff7a18; color: white; }
+.doc-panel { width: 290px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.doc-panel-title { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 1.2px; margin-bottom: 2px; }
+.doc-card {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  background: white; border-radius: 12px; border: 1.5px solid #e2e8f0;
+  cursor: pointer; transition: border-color 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.doc-card:hover { border-color: #ff7a18; }
+.doc-card.active { border: 2px solid #ff7a18; background: #fffaf6; }
+.doc-av {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.c-blue   { background: #0284c7; }
+.c-purple { background: #8b5cf6; }
+.c-green  { background: #10b981; }
+.doc-info h5 { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+.doc-info p  { font-size: 12px; color: #64748b; margin-bottom: 3px; }
+.doc-info .stars { font-size: 12px; color: #ff7a18; font-weight: 600; }
+.info-box {
+  background: #fff8f0; border: 1px solid #fddbb4;
+  padding: 12px 14px; border-radius: 10px; font-size: 13px; color: #92400e;
+}
+.confirm-btn {
+  width: 100%; padding: 14px; background: #ff7a18; color: white;
+  border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; position: relative;
+}
+.confirm-btn:hover:not(:disabled) { background: #e56a0f; }
+.confirm-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-plus">+</div>
+      <div><h2>RuralCare</h2><p>TELEMEDICINE PORTAL</p></div>
+    </div>
+    <p class="sec-label">VIEW AS</p>
+    <div class="roles">
+      <div class="role-card active">
+        <span class="ri">👤</span>
+        <span class="rl">Patient</span>
+        <span class="rs">Book &amp; track health</span>
+      </div>
+    </div>
+    <div class="profile">
+      <div class="profile-av">PD</div>
+      <div><h4>Priya Devi</h4><p>Patient · Nandgaon</p></div>
+    </div>
+    <p class="sec-label">MY CARE</p>
+    <ul class="menu">
+      <li><a href="patient_overview.html"><span class="mi">🏠</span> Home</a></li>
+      <li class="active"><a href="book_appointment.html"><span class="mi">📅</span> Book Appointment</a></li>
+      <li><a href="chat_with_doctor.html"><span class="mi">💬</span> Chat with Doctor</a></li>
+      <li><a href="symptom_checker.html"><span class="mi">🩺</span> Symptom Checker</a></li>
+    </ul>
+    <p class="sec-label">RECORDS</p>
+    <ul class="menu">
+      <li><a href="health_records.html"><span class="mi">📄</span> Health Records</a></li>
+      <li><a href="upload_documents.html"><span class="mi">📤</span> Upload Documents</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <h2>Book Appointment</h2>
+    <p class="subtitle">Browse doctors · Select slots · Confirm booking</p>
+
+    <div class="symptom-banner" id="symptomBanner">
+      <div class="sb-title">🤖 Symptom Report Attached</div>
+      <div class="sb-row">
+        <div class="sb-item"><span class="sb-label">Diagnosis</span><span class="sb-val" id="sb-diagnosis">—</span></div>
+        <div class="sb-item"><span class="sb-label">Symptoms</span><span class="sb-val" id="sb-symptoms">—</span></div>
+        <div class="sb-item"><span class="sb-label">Duration</span><span class="sb-val" id="sb-duration">—</span></div>
+        <div class="sb-item"><span class="sb-label">Severity</span><span class="sb-val" id="sb-severity">—</span></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="cal-card">
+        <div class="cal-head">
+          <h3>April 2026</h3>
+          <div class="nav-btns"><button>‹</button><button>›</button></div>
+        </div>
+        <div class="cal-grid">
+          <div class="day-hdr">SUN</div><div class="day-hdr">MON</div><div class="day-hdr">TUE</div>
+          <div class="day-hdr">WED</div><div class="day-hdr">THU</div><div class="day-hdr">FRI</div><div class="day-hdr">SAT</div>
+          <div class="dc empty"></div><div class="dc empty"></div><div class="dc empty"></div>
+          <div class="dc" onclick="pick(this)">1</div><div class="dc" onclick="pick(this)">2</div>
+          <div class="dc" onclick="pick(this)">3</div><div class="dc" onclick="pick(this)">4</div>
+          <div class="dc" onclick="pick(this)">5</div><div class="dc dot" onclick="pick(this)">6</div>
+          <div class="dc" onclick="pick(this)">7</div><div class="dc dot" onclick="pick(this)">8</div>
+          <div class="dc" onclick="pick(this)">9</div><div class="dc dot" onclick="pick(this)">10</div>
+          <div class="dc" onclick="pick(this)">11</div>
+          <div class="dc dot" onclick="pick(this)">12</div><div class="dc" onclick="pick(this)">13</div>
+          <div class="dc dot" onclick="pick(this)">14</div><div class="dc" onclick="pick(this)">15</div>
+          <div class="dc dot" onclick="pick(this)">16</div><div class="dc" onclick="pick(this)">17</div>
+          <div class="dc" onclick="pick(this)">18</div>
+          <div class="dc dot" onclick="pick(this)">19</div><div class="dc" onclick="pick(this)">20</div>
+          <div class="dc dot" onclick="pick(this)">21</div><div class="dc" onclick="pick(this)">22</div>
+          <div class="dc dot selected" id="d23" onclick="pick(this)">23</div>
+          <div class="dc dot" onclick="pick(this)">24</div><div class="dc dot" onclick="pick(this)">25</div>
+          <div class="dc dot" onclick="pick(this)">26</div><div class="dc" onclick="pick(this)">27</div>
+          <div class="dc dot" onclick="pick(this)">28</div><div class="dc" onclick="pick(this)">29</div>
+          <div class="dc" onclick="pick(this)">30</div>
+          <div class="dc empty"></div><div class="dc empty"></div>
+        </div>
+        <div class="slots-wrap" id="slotsWrap">
+          <p>Select Time Slot:</p>
+          <div class="slot-row">
+            <button class="slot-btn" onclick="pickSlot(this)">10:00 AM</button>
+            <button class="slot-btn" onclick="pickSlot(this)">11:00 AM</button>
+            <button class="slot-btn" onclick="pickSlot(this)">12:00 PM</button>
+            <button class="slot-btn" onclick="pickSlot(this)">02:00 PM</button>
+            <button class="slot-btn" onclick="pickSlot(this)">04:00 PM</button>
+          </div>
+        </div>
+        <div class="cal-bottom-msg" id="bottomMsg">SELECT A DATE TO VIEW SLOTS</div>
+      </div>
+
+      <div class="doc-panel">
+        <p class="doc-panel-title">CHOOSE DOCTOR</p>
+        <div class="doc-card active" onclick="pickDoc(this)">
+          <div class="doc-av c-blue">RS</div>
+          <div class="doc-info">
+            <h5>Dr. Rajesh Singh</h5>
+            <p>General Physician · 12 yrs exp</p>
+            <span class="stars">★★★★★ 4.9</span>
+          </div>
+        </div>
+        <div class="doc-card" onclick="pickDoc(this)">
+          <div class="doc-av c-purple">AK</div>
+          <div class="doc-info">
+            <h5>Dr. Anita Kulkarni</h5>
+            <p>Cardiologist · 15 yrs exp</p>
+            <span class="stars">★★★★★ 4.7</span>
+          </div>
+        </div>
+        <div class="doc-card" onclick="pickDoc(this)">
+          <div class="doc-av c-green">VS</div>
+          <div class="doc-info">
+            <h5>Dr. Vivek Sharma</h5>
+            <p>Dermatologist · 8 yrs exp</p>
+            <span class="stars">★★★★★ 4.8</span>
+          </div>
+        </div>
+        <div class="info-box" id="infoBox">Select a date and time slot to continue</div>
+        <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const SUPABASE_URL      = 'https://zbfuqzkjvdiserqevanu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiZnVxemtqdmRpc2VycWV2YW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjY5NzAsImV4cCI6MjA5MjU0Mjk3MH0.A-Av4EyOBDZ-42OMPX1pEQUYMtEvzwJNmKdCY9lJSIA';
+  const SUPABASE_TABLE    = 'appointments';
+
+  let selDate = '23', selSlot = null, selDoc = 'Dr. Rajesh Singh';
+  let pendingSymptomReport = null;   // full report object including supabaseId if set
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const stored = localStorage.getItem('ruralcare_pending_symptom_report');
+    if (stored) {
+      try {
+        pendingSymptomReport = JSON.parse(stored);
+        document.getElementById('symptomBanner').style.display = 'block';
+        document.getElementById('sb-diagnosis').textContent = pendingSymptomReport.diagnosis;
+        document.getElementById('sb-symptoms').textContent  = pendingSymptomReport.symptoms.join(', ');
+        document.getElementById('sb-duration').textContent  = pendingSymptomReport.duration;
+        document.getElementById('sb-severity').textContent  = pendingSymptomReport.severity;
+        localStorage.removeItem('ruralcare_pending_symptom_report');
+      } catch(e) {}
+    }
+    document.getElementById('slotsWrap').style.display = 'block';
+    document.getElementById('bottomMsg').style.display = 'none';
+  });
+
+  function pick(el) {
+    if (el.classList.contains('empty')) return;
+    document.querySelectorAll('.dc').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    selDate = el.textContent.trim();
+    selSlot = null;
+    document.querySelectorAll('.slot-btn').forEach(s => s.classList.remove('active'));
+    document.getElementById('slotsWrap').style.display = 'block';
+    document.getElementById('bottomMsg').style.display = 'none';
+    updateInfo();
+  }
+
+  function pickSlot(el) {
+    document.querySelectorAll('.slot-btn').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    selSlot = el.textContent.trim();
+    updateInfo();
+  }
+
+  function pickDoc(el) {
+    document.querySelectorAll('.doc-card').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+    selDoc = el.querySelector('h5').textContent;
+    updateInfo();
+  }
+
+  function updateInfo() {
+    const box = document.getElementById('infoBox');
+    if (selDate && selSlot) {
+      box.style.cssText = 'background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:12px 14px;border-radius:10px;font-size:13px;';
+      box.textContent = `✅ April ${selDate} at ${selSlot} with ${selDoc}`;
+    } else {
+      box.style.cssText = 'background:#fff8f0;border:1px solid #fddbb4;color:#92400e;padding:12px 14px;border-radius:10px;font-size:13px;';
+      box.textContent = 'Select a date and time slot to continue';
+    }
+  }
+
+  async function confirmBooking() {
+    if (!selSlot) { alert('Please select a time slot!'); return; }
+    if (!selDate) { alert('Please select a date!'); return; }
+
+    const btn = document.getElementById('confirmBtn');
+    const box = document.getElementById('infoBox');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span>Saving…';
+
+    const existingId = pendingSymptomReport?.supabaseId || null;
+
+    try {
+      if (existingId) {
+        // ── CASE A: Came from symptom checker → PATCH the existing row ──
+        // Only update the booking fields; symptom fields are already saved
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${existingId}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              doctor:    selDoc,
+              date:      `April ${selDate}, 2026`,
+              time:      selSlot,
+              status:    'Confirmed',
+              booked_on: new Date().toLocaleDateString()
+            })
+          }
+        );
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `Supabase PATCH error ${res.status}`);
+        }
+        console.log('Row updated (PATCH) ✅ id:', existingId);
+
+      } else {
+        // ── CASE B: Direct booking (no symptom checker) → INSERT new row ──
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({
+            patient_name:     'Priya Devi',
+            patient_id:       'PT-1042',
+            patient_location: 'Nandgaon',
+            initials:         'PD',
+            doctor:           selDoc,
+            date:             `April ${selDate}, 2026`,
+            time:             selSlot,
+            status:           'Confirmed',
+            booked_on:        new Date().toLocaleDateString()
+          })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `Supabase POST error ${res.status}`);
+        }
+        console.log('New row inserted (POST) ✅');
+      }
+
+      // ── Success UI ──
+      box.style.cssText = 'background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;';
+      box.textContent = '✅ Appointment Confirmed!';
+      btn.innerHTML = '✅ Booking Confirmed';
+      btn.style.background = '#16a34a';
+
+    } catch (err) {
+      console.error('Booking failed:', err);
+      box.style.cssText = 'background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;';
+      box.textContent = `❌ Failed: ${err.message}`;
+      btn.disabled = false;
+      btn.innerHTML = 'Retry Booking';
+      btn.style.background = '#ff7a18';
+    }
+  }
+</script>
+</body>
+</html>

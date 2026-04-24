@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Dashboard</title>
+  <link rel="stylesheet" href="doctor_overview.css" />
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ── Appointments Table ── */
+    .appointments {
+      margin-top: 24px;
+    }
+
+    .appointments h3 {
+      margin-bottom: 14px;
+      font-size: 1.1rem;
+    }
+
+    .appt-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .appt-table thead {
+      background: #f0f4ff;
+    }
+
+    .appt-table th,
+    .appt-table td {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #eef0f5;
+    }
+
+    .appt-table th {
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+
+    .appt-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .appt-table tbody tr:hover {
+      background: #f9faff;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .badge.scheduled  { background: #e0f0ff; color: #1a6fc4; }
+    .badge.confirmed  { background: #e0ffe8; color: #1a7c3e; }
+    .badge.pending    { background: #fff7e0; color: #a06600; }
+    .badge.cancelled  { background: #ffe0e0; color: #b91c1c; }
+    .badge.completed  { background: #f0f0f0; color: #555; }
+
+    /* Loading / error / empty states */
+    .appt-state {
+      padding: 28px 16px;
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .appt-state .spinner {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      border: 3px solid #dde;
+      border-top-color: #6a7ff0;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .appt-state.error { color: #c0392b; }
+
+    /* ── Empty box (kept for fallback) ── */
+    .empty-box {
+      padding: 28px;
+      text-align: center;
+      color: #aaa;
+      border: 1px dashed #ddd;
+      border-radius: 10px;
+      display: none; /* hidden; shown only when explicitly needed */
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <div class="view-as">
+      <div class="role-switch">
+        <div class="role active">
+          <h4>🩺 Doctor</h4>
+          <p>Manage patients</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">RS</div>
+      <div>
+        <h4>Dr. Rajesh Singh</h4>
+        <p>General Physician</p>
+      </div>
+    </div>
+
+    <nav>
+      <p class="section-title">MAIN</p>
+      <ul class="menu">
+        <a href="doctor_overview.html" class="menu-item active">🏠 Overview</a>
+        <a href="doctor_consultation.html" class="menu-item">💬 Consultations</a>
+        <a href="doctor_patients.html" class="menu-item">👥 Patients</a>
+      </ul>
+
+      <p class="section-title">TOOLS</p>
+      <ul class="menu">
+        <a href="medical_records.html" class="menu-item">📄 Records</a>
+      </ul>
+    </nav>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Dashboard Overview</h2>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- EXISTING CARDS -->
+      <div class="cards">
+        <div class="card">
+          <h3>👥 Patients</h3>
+          <p class="number">124</p>
+          <span>Total Registered</span>
+        </div>
+
+        <div class="card">
+          <h3>📅 Appointments</h3>
+          <p class="number">18</p>
+          <span>Today</span>
+        </div>
+
+        <div class="card">
+          <h3>💬 Consultations</h3>
+          <p class="number">9</p>
+          <span>Pending</span>
+        </div>
+
+        <div class="card">
+          <h3>📊 Reports</h3>
+          <p class="number">32</p>
+          <span>This Week</span>
+        </div>
+      </div>
+
+      <!-- EXISTING PANEL -->
+      <div class="panel">
+        <h3>Recent Activity</h3>
+        <p>No recent updates yet...</p>
+      </div>
+
+      <!-- EXTRA CARDS -->
+      <div class="extra-cards">
+
+        <div class="extra-card">
+          <p>Today's Patients</p>
+          <h2>12</h2>
+          <span>+3 from yesterday</span>
+        </div>
+
+        <div class="extra-card">
+          <p>Pending Approvals</p>
+          <h2>4</h2>
+          <span>2 urgent</span>
+        </div>
+
+        <div class="extra-card">
+          <p>Active Consultations</p>
+          <h2>3</h2>
+          <span>2 unread messages</span>
+        </div>
+
+        <div class="extra-card">
+          <p>Prescriptions Issued</p>
+          <h2>27</h2>
+          <span>This week</span>
+        </div>
+
+      </div>
+
+      <!-- FEATURES -->
+      <div class="features-section">
+
+        <div class="feature doctor-feature">
+          <h3>Doctor Features</h3>
+          <ul>
+            <li>AI Symptom Triage</li>
+            <li>Write &amp; Send Prescriptions</li>
+            <li>Full Patient Access</li>
+            <li>Appointment Approval</li>
+            <li>Analytics Dashboard</li>
+          </ul>
+        </div>
+
+        <div class="feature patient-feature">
+          <h3>Patient Features</h3>
+          <ul>
+            <li>Book Appointments</li>
+            <li>Symptom Checker</li>
+            <li>Health Timeline</li>
+            <li>Medication Reminders</li>
+            <li>Offline Support</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- TODAY'S APPOINTMENTS — populated by Supabase -->
+      <!-- <div class="appointments">
+        <h3>Today's Appointments</h3> -->
+
+        <!-- Loading state shown by default -->
+        <!-- <div id="appt-loading" class="appt-state">
+          <div class="spinner"></div><br>
+          Fetching today's appointments…
+        </div> -->
+
+        <!-- Error state (hidden until needed) -->
+        <!-- <div id="appt-error" class="appt-state error" style="display:none;">
+          ⚠️ Could not load appointments. Check your Supabase configuration.
+        </div> -->
+
+        <!-- Empty state (hidden until needed) -->
+        <!-- <div id="appt-empty" class="appt-state" style="display:none;">
+          📭 No appointments scheduled for today.
+        </div> -->
+
+        <!-- Data table (hidden until populated) -->
+        <!-- <table class="appt-table" id="appt-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Patient Name</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="appt-tbody">
+            Rows injected by JS -->
+          <!-- </tbody>
+        </table> -->
+
+      </div><!-- /.appointments -->
+
+    </div><!-- /.content -->
+
+  </main>
+
+</div><!-- /.layout -->
+
+<script>
+  /* ─────────────────────────────────────────────
+     EXISTING: sidebar toggle (unchanged)
+  ───────────────────────────────────────────── */
+  const toggle = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+  }
+
+  /* ─────────────────────────────────────────────
+     NEW: Supabase — Today's Appointments
+     ─────────────────────────────────────────────
+     Replace the two placeholder values below
+     with your actual Supabase project URL and
+     anon/public key from:
+     Supabase Dashboard → Project Settings → API
+  ───────────────────────────────────────────── */
+  const SUPABASE_URL  = "https://zbfuqzkjvdiserqevanu.supabase.co";   // ← replace
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiZnVxemtqdmRpc2VycWV2YW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjY5NzAsImV4cCI6MjA5MjU0Mjk3MH0.A-Av4EyOBDZ-42OMPX1pEQUYMtEvzwJNmKdCY9lJSIA";                // ← replace
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  async function loadTodayAppointments() {
+    const loadingEl = document.getElementById("appt-loading");
+    const errorEl   = document.getElementById("appt-error");
+    const emptyEl   = document.getElementById("appt-empty");
+    const tableEl   = document.getElementById("appt-table");
+    const tbodyEl   = document.getElementById("appt-tbody");
+
+    /* Build today's date range in ISO format (UTC) */
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    try {
+      const { data, error } = await supabaseClient
+        .from("appointments")            // ← your table name
+        .select("id, patient_name, appointment_time, status")
+        .gte("appointment_time", todayStart.toISOString())
+        .lte("appointment_time", todayEnd.toISOString())
+        .order("appointment_time", { ascending: true });
+
+      /* Hide loader */
+      loadingEl.style.display = "none";
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        emptyEl.style.display = "block";
+        return;
+      }
+
+      /* Build table rows */
+      tbodyEl.innerHTML = data.map((appt, index) => {
+        const time   = appt.appointment_time
+          ? new Date(appt.appointment_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          : "—";
+        const status = (appt.status || "scheduled").toLowerCase();
+        const name   = appt.patient_name || "Unknown Patient";
+
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(name)}</td>
+            <td>${time}</td>
+            <td><span class="badge ${status}">${status}</span></td>
+          </tr>`;
+      }).join("");
+
+      tableEl.style.display = "table";
+
+    } catch (err) {
+      console.error("Supabase error:", err);
+      loadingEl.style.display = "none";
+      errorEl.style.display   = "block";
+    }
+  }
+
+  /* Tiny XSS guard */
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /* Run on page load */
+  loadTodayAppointments();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consultations - Patient</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", sans-serif;
+  }
+
+  body {
+    background: #f4f7fb;
+    overflow: hidden;
+  }
+
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ── SIDEBAR (replaced to match reference) ── */
+  .sidebar {
+    width: 242px;
+    min-width: 242px;
+    background: #1c2333;
+    color: #8b95b8;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px 14px;
+  }
+
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    background: #e8762b;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 19px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .logo h2 { color: #ffffff; font-size: 15px; font-weight: 700; }
+  .logo p  { color: #5a6480; font-size: 9px; font-weight: 600; letter-spacing: 0.12em; margin-top: 1px; }
+
+  /* VIEW AS */
+  .view-as-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #4b5675;
+    padding: 8px 16px 6px;
+    text-transform: uppercase;
+  }
+
+  .view-as-cards {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 14px;
+  }
+
+  .view-card {
+    flex: 1;
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .view-card.inactive {
+    background: #252d42;
+    border: 1px solid #2e3852;
+  }
+
+  .view-card.active {
+    background: #e8762b;
+    border: 1px solid #e8762b;
+  }
+
+  .view-card .vc-icon  { font-size: 20px; display: block; margin-bottom: 4px; }
+  .view-card .vc-title { font-size: 11px; font-weight: 700; display: block; }
+  .view-card .vc-sub   { font-size: 9.5px; display: block; margin-top: 1px; opacity: 0.8; }
+
+  .view-card.inactive .vc-title,
+  .view-card.inactive .vc-sub  { color: #8b95b8; }
+  .view-card.active .vc-title,
+  .view-card.active .vc-sub    { color: #fff; }
+
+  /* Profile row */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px 14px;
+    border-top: 1px solid #252d42;
+  }
+
+  .p-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e8762b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .p-info h4 { color: #e2e8f0; font-size: 13px; font-weight: 600; }
+  .p-info p  { color: #5a6480; font-size: 11px; margin-top: 1px; }
+
+  /* Nav sections */
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #4b5675;
+    padding: 10px 16px 4px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b95b8;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+    position: relative;
+  }
+
+  .nav-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #c8d0e4;
+  }
+
+  .nav-item.active {
+    background: rgba(232,118,43,0.13);
+    color: #e8762b;
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 4px; bottom: 4px;
+    width: 3px;
+    background: #e8762b;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+
+  /* Footer */
+  .sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid #252d42;
+    padding: 6px 0 8px;
+  }
+
+  /* ── ALL ORIGINAL STYLES BELOW UNCHANGED ── */
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* CHAT LAYOUT */
+  .chat-container {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* CHAT BOX */
+  .chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    background: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e6ed;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-header .doc-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #2bb3c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f4f7fb;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* MESSAGE */
+  .msg {
+    max-width: 60%;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    position: relative;
+    word-wrap: break-word;
+  }
+
+  .msg.doctor {
+    background: white;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .msg.patient {
+    background: #22c55e;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg .sender-name {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    opacity: 0.75;
+  }
+
+  .time {
+    display: block;
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* INPUT */
+  .chat-input {
+    display: flex;
+    padding: 12px 15px;
+    background: white;
+    border-top: 1px solid #e0e6ed;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .chat-input input:focus {
+    border-color: #22c55e;
+  }
+
+  .chat-input button {
+    background: #22c55e;
+    border: none;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+  }
+
+  .chat-input button:hover {
+    background: #16a34a;
+  }
+
+  /* Connection badge */
+  .conn-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .conn-badge.connected { background: #dcfce7; color: #16a34a; }
+  .conn-badge.connecting { background: #fef9c3; color: #ca8a04; }
+  .conn-badge.disconnected { background: #fee2e2; color: #dc2626; }
+
+  /* Typing indicator */
+  .typing {
+    font-size: 12px;
+    color: #94a3b8;
+    padding: 0 20px 8px;
+    min-height: 22px;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: -242px;
+      top: 0;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+    .sidebar.active { left: 0; }
+  }
+  </style>
+</head>
+
+<body>
+<div class="layout">
+
+  <!-- ── SIDEBAR (replaced to match reference) ── -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <!-- VIEW AS -->
+    <p class="view-as-label">View As</p>
+    <div class="view-as-cards">
+      <!-- <a href="doctor_dashboard.html" class="view-card inactive">
+        <span class="vc-icon">🩺</span>
+        <span class="vc-title">Doctor</span>
+        <span class="vc-sub">Manage patients &amp; consults</span>
+      </a> -->
+      <a href="patient_overview.html" class="view-card active">
+        <span class="vc-icon">👤</span>
+        <span class="vc-title">Patient</span>
+        <span class="vc-sub">Book &amp; track health</span>
+      </a>
+    </div>
+
+    <!-- Profile -->
+    <div class="profile-row">
+      <div class="p-avatar">PD</div>
+      <div class="p-info">
+        <h4>Priya Devi</h4>
+        <p>Patient · Nandgaon</p>
+      </div>
+    </div>
+
+    <!-- MY CARE -->
+    <p class="nav-section-label">My Care</p>
+    <a href="patient_overview.html" class="nav-item">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+    <a href="book_appointment.html" class="nav-item">
+      <span class="nav-icon">📅</span> Book Appointment
+    </a>
+    <a href="chat_with_doctor.html" class="nav-item active">
+      <span class="nav-icon">💬</span> Chat with Doctor
+    </a>
+    <a href="symptom_checker.html" class="nav-item">
+      <span class="nav-icon">🩺</span> Symptom Checker
+    </a>
+
+    <!-- RECORDS -->
+    <p class="nav-section-label">Records</p>
+    <a href="health_records.html" class="nav-item">
+      <span class="nav-icon">📄</span> Health Records
+    </a>
+    <a href="upload_documents.html" class="nav-item">
+      <span class="nav-icon">📤</span> Upload Documents
+    </a>
+  
+
+    <!-- Footer -->
+    
+
+  </aside>
+
+  <!-- ── MAIN CHAT (100% original, untouched) ── -->
+  <main class="main">
+    <div class="chat-container">
+
+      <div class="chat-box">
+
+        <div class="chat-header">
+          <div class="doc-avatar">RS</div>
+          <div>
+            <h3>Dr. Rajesh Singh</h3>
+            <small style="color:green;">General Physician • Online</small>
+          </div>
+          <span class="conn-badge connecting" id="connBadge">Connecting...</span>
+        </div>
+
+        <div class="messages" id="messages"></div>
+        <div class="typing" id="typingIndicator"></div>
+
+        <div class="chat-input">
+          <input type="text" id="inputMsg" placeholder="Type your message..." onkeydown="handleKey(event)" oninput="handleTyping()">
+          <button onclick="sendMessage()">➤</button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Ably SDK -->
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+
+<script>
+  const ABLY_KEY = "N3WFJQ.yQcF6A:9idLqAJBblPym82gNXRGKeIWLb12grfT7LBg5_pDbZQ";
+  const ROLE = "patient";
+  const PATIENT_NAME = "Priya Devi";
+  const ROOM = "priya-devi"; // must match doctor's room for this patient
+
+  let channel = null;
+  let ably = null;
+  let typingTimer = null;
+  let isTyping = false;
+
+  function initAbly() {
+    ably = new Ably.Realtime({ key: ABLY_KEY });
+
+    ably.connection.on('connected', () => {
+      document.getElementById('connBadge').textContent = '🟢 Connected';
+      document.getElementById('connBadge').className = 'conn-badge connected';
+    });
+
+    ably.connection.on('connecting', () => {
+      document.getElementById('connBadge').textContent = 'Connecting...';
+      document.getElementById('connBadge').className = 'conn-badge connecting';
+    });
+
+    ably.connection.on('disconnected', () => {
+      document.getElementById('connBadge').textContent = '🔴 Disconnected';
+      document.getElementById('connBadge').className = 'conn-badge disconnected';
+    });
+
+    channel = ably.channels.get(`ruralcare-chat-${ROOM}`);
+
+    // Receive messages
+    channel.subscribe('message', (msg) => {
+      const data = msg.data;
+      if (data.sender !== ROLE) {
+        appendMessage(data.text, 'doctor', data.name, data.time);
+      }
+    });
+
+    // Typing indicator
+    channel.subscribe('typing', (msg) => {
+      const data = msg.data;
+      if (data.sender !== ROLE) {
+        if (data.isTyping) {
+          document.getElementById('typingIndicator').textContent = `${data.name} is typing...`;
+        } else {
+          document.getElementById('typingIndicator').textContent = '';
+        }
+      }
+    });
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('inputMsg');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    channel.publish('message', {
+      sender: ROLE,
+      name: PATIENT_NAME,
+      text: text,
+      time: time
+    });
+
+    appendMessage(text, 'patient', PATIENT_NAME, time);
+    input.value = '';
+    sendTyping(false);
+  }
+
+  function appendMessage(text, type, name, time) {
+    const messagesDiv = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `msg ${type}`;
+    div.innerHTML = `
+      <div class="sender-name">${type === 'doctor' ? '🩺 ' + name : '👤 ' + name}</div>
+      ${text}
+      <span class="time">${time}</span>
+    `;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter') sendMessage();
+  }
+
+  function handleTyping() {
+    if (!isTyping) {
+      isTyping = true;
+      sendTyping(true);
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      isTyping = false;
+      sendTyping(false);
+    }, 1500);
+  }
+
+  function sendTyping(typing) {
+    if (channel) {
+      channel.publish('typing', {
+        sender: ROLE,
+        name: PATIENT_NAME,
+        isTyping: typing
+      });
+    }
+  }
+
+  initAbly();
+</script>
+
+</body>
+</html>

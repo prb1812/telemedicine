@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consultations - Doctor</title>
+ 
+  <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+  }
+ 
+  body {
+    background: #f4f7fb;
+    overflow: hidden;
+  }
+ 
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+ 
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #0f1b2d, #0a1424);
+    color: #cbd5e1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+ 
+  .logo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+ 
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #2bb3c0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+  }
+ 
+  .logo h2 { color: white; }
+  .logo p { font-size: 11px; opacity: 0.6; }
+ 
+  .section-title {
+    font-size: 12px;
+    margin: 15px 0 10px;
+    opacity: 0.6;
+  }
+ 
+  .role {
+    padding: 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2bb3c0, #2d9cdb);
+    color: white;
+    text-align: center;
+  }
+ 
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+  }
+ 
+  .avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #2bb3c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+ 
+  .menu { list-style: none; }
+ 
+  .menu a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+ 
+  .menu-item {
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #cbd5e1;
+  }
+ 
+  .menu-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+  }
+ 
+  .menu-item.active {
+    background: rgba(45,156,219,0.2);
+    color: #2bb3c0;
+  }
+ 
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+ 
+  /* CHAT LAYOUT */
+  .chat-container {
+    display: flex;
+    height: 100vh;
+  }
+ 
+  /* LEFT PANEL */
+  .chat-list {
+    width: 280px;
+    background: white;
+    border-right: 1px solid #e0e6ed;
+    padding: 15px;
+    overflow-y: auto;
+  }
+ 
+  .search {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    outline: none;
+  }
+ 
+  .chat-user {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    align-items: center;
+  }
+ 
+  .chat-user:hover { background: #f1f5f9; }
+  .chat-user.active { background: #e6f7f9; }
+ 
+  /* RIGHT CHAT */
+  .chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  .chat-header {
+    background: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e6ed;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  .chat-header .avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+ 
+  .messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f4f7fb;
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  /* MESSAGE */
+  .msg {
+    max-width: 60%;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    position: relative;
+    word-wrap: break-word;
+  }
+ 
+  .msg.patient {
+    background: white;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+ 
+  .msg.doctor {
+    background: #2bb3c0;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+ 
+  .msg .sender-name {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    opacity: 0.75;
+  }
+ 
+  .time {
+    display: block;
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 4px;
+    text-align: right;
+  }
+ 
+  /* INPUT */
+  .chat-input {
+    display: flex;
+    padding: 12px 15px;
+    background: white;
+    border-top: 1px solid #e0e6ed;
+    gap: 10px;
+    align-items: center;
+  }
+ 
+  .chat-input input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+  }
+ 
+  .chat-input input:focus {
+    border-color: #2bb3c0;
+  }
+ 
+  .chat-input button {
+    background: #2bb3c0;
+    border: none;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+  }
+ 
+  .chat-input button:hover {
+    background: #239aa6;
+  }
+ 
+  /* Status indicator */
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+  }
+ 
+  .status-dot.online { background: #22c55e; }
+  .status-dot.offline { background: #94a3b8; }
+ 
+  /* Connection badge */
+  .conn-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+ 
+  .conn-badge.connected { background: #dcfce7; color: #16a34a; }
+  .conn-badge.connecting { background: #fef9c3; color: #ca8a04; }
+  .conn-badge.disconnected { background: #fee2e2; color: #dc2626; }
+ 
+  /* Typing indicator */
+  .typing {
+    font-size: 12px;
+    color: #94a3b8;
+    padding: 0 20px 8px;
+    min-height: 22px;
+    font-style: italic;
+  }
+ 
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: -260px;
+      top: 0;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+    .sidebar.active { left: 0; }
+  }
+  </style>
+</head>
+ 
+<body>
+<div class="layout">
+ 
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+ 
+    <div class="role">
+      <h4>🩺 Doctor</h4>
+      <p>Manage patients</p>
+    </div>
+ 
+    <div class="profile">
+      <div class="avatar">RS</div>
+      <div>
+        <h4 style="color:white;">Dr. Rajesh Singh</h4>
+        <p style="font-size:12px;">General Physician</p>
+      </div>
+    </div>
+ 
+    <nav>
+      <p class="section-title">MAIN</p>
+      <ul class="menu">
+        <a href="doctor_overview.html" class="menu-item">🏠 Overview</a>
+        <a href="doctor_consultation.html" class="menu-item active">💬 Consultations</a>
+        <!-- <a href="doctor_appointment.html" class="menu-item">📅 Appointments</a> -->
+        <a href="doctor_patients.html" class="menu-item">👥 Patients</a>
+      </ul>
+      <p class="section-title">TOOLS</p>
+      <ul class="menu">
+        <a href="medical_records.html" class="menu-item">📄 Records</a>
+      </ul>
+    </nav>
+  </aside>
+ 
+  <!-- MAIN CHAT -->
+  <main class="main">
+    <div class="chat-container">
+ 
+      <!-- LEFT USERS -->
+      <div class="chat-list">
+        <input type="text" class="search" placeholder="Search conversations...">
+ 
+        <div class="chat-user active" onclick="switchChat('priya-devi', 'Priya Devi', 'PD')">
+          <div class="avatar" style="background:#e879a0;">PD</div>
+          <div>
+            <h4>Priya Devi</h4>
+            <small><span class="status-dot online"></span>Online</small>
+          </div>
+        </div>
+ 
+        <div class="chat-user" onclick="switchChat('ramesh-kumar', 'Ramesh Kumar', 'RK')">
+          <div class="avatar" style="background:#8b5cf6;">RK</div>
+          <div>
+            <h4>Ramesh Kumar</h4>
+            <small><span class="status-dot offline"></span>Offline</small>
+          </div>
+        </div>
+ 
+      </div>
+ 
+      <!-- RIGHT CHAT -->
+      <div class="chat-box">
+ 
+        <div class="chat-header">
+          <div class="avatar" id="headerAvatar" style="background:#e879a0;">PD</div>
+          <div>
+            <h3 id="headerName">Priya Devi</h3>
+            <small style="color:green;" id="headerStatus">Online</small>
+          </div>
+          <span class="conn-badge connecting" id="connBadge">Connecting...</span>
+        </div>
+ 
+        <div class="messages" id="messages"></div>
+        <div class="typing" id="typingIndicator"></div>
+ 
+        <div class="chat-input">
+          <input type="text" id="inputMsg" placeholder="Type your message..." onkeydown="handleKey(event)" oninput="handleTyping()">
+          <button onclick="sendMessage()">➤</button>
+        </div>
+ 
+      </div>
+    </div>
+  </main>
+</div>
+ 
+<!-- Ably SDK -->
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+ 
+<script>
+  const ABLY_KEY = "N3WFJQ.yQcF6A:9idLqAJBblPym82gNXRGKeIWLb12grfT7LBg5_pDbZQ";
+  const ROLE = "doctor";
+  const DOCTOR_NAME = "Dr. Rajesh Singh";
+ 
+  let currentChannel = null;
+  let currentRoom = "priya-devi";
+  let ably = null;
+  let typingTimer = null;
+  let isTyping = false;
+ 
+  // Init Ably
+  function initAbly() {
+    ably = new Ably.Realtime({ key: ABLY_KEY });
+ 
+    ably.connection.on('connected', () => {
+      document.getElementById('connBadge').textContent = '🟢 Connected';
+      document.getElementById('connBadge').className = 'conn-badge connected';
+    });
+ 
+    ably.connection.on('connecting', () => {
+      document.getElementById('connBadge').textContent = 'Connecting...';
+      document.getElementById('connBadge').className = 'conn-badge connecting';
+    });
+ 
+    ably.connection.on('disconnected', () => {
+      document.getElementById('connBadge').textContent = '🔴 Disconnected';
+      document.getElementById('connBadge').className = 'conn-badge disconnected';
+    });
+ 
+    joinRoom(currentRoom);
+  }
+ 
+  // Join a chat room
+  function joinRoom(room) {
+    if (currentChannel) {
+      currentChannel.unsubscribe();
+    }
+ 
+    currentRoom = room;
+    currentChannel = ably.channels.get(`ruralcare-chat-${room}`);
+ 
+    // Clear messages
+    document.getElementById('messages').innerHTML = '';
+ 
+    // Listen for messages
+    currentChannel.subscribe('message', (msg) => {
+      const data = msg.data;
+      if (data.sender !== ROLE) {
+        appendMessage(data.text, 'patient', data.name, data.time);
+      }
+    });
+ 
+    // Listen for typing
+    currentChannel.subscribe('typing', (msg) => {
+      const data = msg.data;
+      if (data.sender !== ROLE) {
+        if (data.isTyping) {
+          document.getElementById('typingIndicator').textContent = `${data.name} is typing...`;
+        } else {
+          document.getElementById('typingIndicator').textContent = '';
+        }
+      }
+    });
+  }
+ 
+  // Switch patient
+  function switchChat(room, name, initials) {
+    // Update active user
+    document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+ 
+    // Update header
+    document.getElementById('headerName').textContent = name;
+    document.getElementById('headerAvatar').textContent = initials;
+    document.getElementById('typingIndicator').textContent = '';
+ 
+    joinRoom(room);
+  }
+ 
+  // Send message
+  function sendMessage() {
+    const input = document.getElementById('inputMsg');
+    const text = input.value.trim();
+    if (!text) return;
+ 
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+ 
+    const msgData = {
+      sender: ROLE,
+      name: DOCTOR_NAME,
+      text: text,
+      time: time
+    };
+ 
+    currentChannel.publish('message', msgData);
+    appendMessage(text, 'doctor', DOCTOR_NAME, time);
+    input.value = '';
+ 
+    // Stop typing
+    sendTyping(false);
+  }
+ 
+  // Append message to UI
+  function appendMessage(text, type, name, time) {
+    const messagesDiv = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `msg ${type}`;
+    div.innerHTML = `
+      <div class="sender-name">${type === 'doctor' ? '🩺 ' + name : '👤 ' + name}</div>
+      ${text}
+      <span class="time">${time}</span>
+    `;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+ 
+  // Handle Enter key
+  function handleKey(e) {
+    if (e.key === 'Enter') sendMessage();
+  }
+ 
+  // Typing indicator
+  function handleTyping() {
+    if (!isTyping) {
+      isTyping = true;
+      sendTyping(true);
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      isTyping = false;
+      sendTyping(false);
+    }, 1500);
+  }
+ 
+  function sendTyping(typing) {
+    if (currentChannel) {
+      currentChannel.publish('typing', {
+        sender: ROLE,
+        name: DOCTOR_NAME,
+        isTyping: typing
+      });
+    }
+  }
+ 
+  // Start
+  initAbly();
+</script>
+ 
+</body>
+</html>

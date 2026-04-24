@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RuralCare – My Health Timeline</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-bg: #16181d;
+      --sidebar-border: #2a2d35;
+      --sidebar-text: #b0b4bf;
+      --sidebar-text-muted: #5a5f6e;
+      --sidebar-active-bg: #2a2d35;
+      --sidebar-active-text: #f0f0f0;
+      --accent-orange: #e87b3e;
+      --accent-orange-light: #fff0e8;
+      --main-bg: #f5f4f1;
+      --card-bg: #ffffff;
+      --text-primary: #1a1b1e;
+      --text-muted: #8a8f9c;
+      --border: #e8e8e4;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--main-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 260px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 28px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 4px;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--accent-orange);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      color: #fff;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .logo h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f0f0f0;
+      letter-spacing: -0.2px;
+    }
+    .logo p {
+      font-size: 0.60rem;
+      color: var(--sidebar-text-muted);
+      letter-spacing: 1.2px;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+
+    /* Section titles */
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 1.4px;
+      font-weight: 600;
+      color: var(--sidebar-text-muted);
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    /* VIEW AS */
+    .view-as-block { display: flex; flex-direction: column; }
+
+    .role-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--sidebar-active-bg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid #353840;
+      cursor: pointer;
+    }
+    .role-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: #3b2a6e;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .role-card h4 { font-size: 0.85rem; font-weight: 600; color: #f0f0f0; }
+    .role-card p  { font-size: 0.72rem; color: var(--sidebar-text-muted); margin-top: 1px; }
+
+    /* Profile */
+    .profile-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--sidebar-active-bg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid #353840;
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #c95f2e;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .profile-block h4 { font-size: 0.85rem; font-weight: 600; color: #f0f0f0; }
+    .profile-block p  { font-size: 0.72rem; color: var(--sidebar-text-muted); margin-top: 1px; }
+
+    /* Nav */
+    nav { display: flex; flex-direction: column; gap: 20px; }
+    .nav-group { display: flex; flex-direction: column; }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      font-weight: 500;
+    }
+    .menu-item:hover {
+      background: #22262e;
+      color: #e0e0e0;
+    }
+    .menu-item.active {
+      background: rgba(232, 123, 62, 0.18);
+      color: var(--accent-orange);
+    }
+    .menu-item .menu-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      flex: 1;
+      padding: 40px 48px;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+    }
+    .page-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Timeline Card */
+    .timeline-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+      max-width: 560px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    }
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.2px;
+      margin-bottom: 22px;
+    }
+
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid #f0f0ec;
+    }
+    .timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .timeline-item:first-child { padding-top: 0; }
+
+    .icon-wrap {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .icon-wrap.orange { background: #fff0e8; }
+    .icon-wrap.red    { background: #fdecea; }
+    .icon-wrap.green  { background: #edf7f0; }
+    .icon-wrap.gray   { background: #f2f2f0; }
+
+    .item-content { flex: 1; }
+
+    .item-date {
+      font-size: 0.71rem;
+      color: #aaa;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'DM Mono', monospace;
+    }
+    .today-badge {
+      background: #fff0e8;
+      color: var(--accent-orange);
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 20px;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.3px;
+    }
+
+    .item-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    .item-desc {
+      font-size: 0.80rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-size: 0.69rem;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #f2f2f0;
+      color: #555;
+      border: 1px solid #e8e8e4;
+    }
+    .tag.orange { background: #fff0e8; color: #c96828; border-color: #fddcc4; }
+    .tag.red    { background: #fdecea; color: #c0392b; border-color: #f5c6c2; }
+    .tag.green  { background: #edf7f0; color: #1f7a45; border-color: #b8e4c8; }
+    .tag.blue   { background: #e8f0fb; color: #2c5fad; border-color: #bdd0f0; }
+
+    /* Scrollbar styling for sidebar */
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: #2e3240; border-radius: 4px; }
+    .menu-item a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+  </style>
+</head>
+<body>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <!-- View As -->
+    <div class="view-as-block">
+      <p class="section-label">VIEW AS</p>
+      <div class="role-card">
+        <div class="role-icon">🧑‍⚕️</div>
+        <div>
+          <h4>Patient</h4>
+          <p>Track your health</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="profile-block">
+      <div class="avatar">PD</div>
+      <div>
+        <h4>Priya Devi</h4>
+        <p>Patient · Nandgaon</p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+   <nav>
+      <div class="nav-group">
+        <p class="section-label">MY CARE</p>
+        <ul class="menu">
+          <li class="menu-item"><a href="patient_overview.html"><span class="menu-icon">🏠</span> Home</a></li>
+          <li class="menu-item"><a href="book_appointment.html"><span class="menu-icon">📅</span> Book Appointment</a></li>
+          <li class="menu-item"><a href="chat_with_doctor.html"><span class="menu-icon">💬</span> Chat with Doctor</a></li>
+          <li class="menu-item"><a href="symptom_checker.html"><span class="menu-icon">🩺</span> Symptom Checker</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <p class="section-label">RECORDS</p>
+        <ul class="menu">
+          <li class="menu-item active"><a href="health_records.html"><span class="menu-icon">📄</span> Health Records</a></li>
+          <li class="menu-item"><a href="upload_documents.html"><span class="menu-icon">📤</span> Upload Documents</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="main">
+
+    <div class="page-header">
+      <h1 class="page-title">My Health Timeline</h1>
+      <p class="page-sub">Your personal visit history, diagnoses &amp; treatments</p>
+    </div>
+
+    <div class="timeline-card">
+      <p class="card-title">Visit History</p>
+
+      <div class="timeline">
+
+        <!-- Entry 1 -->
+        <div class="timeline-item">
+          <div class="icon-wrap orange">🌡️</div>
+          <div class="item-content">
+            <div class="item-date">
+              23 Apr 2026
+              <span class="today-badge">Today</span>
+            </div>
+            <div class="item-title">Viral Fever Consultation</div>
+            <div class="item-desc">Dr. Rajesh Singh · Diagnosed with mild viral infection. Prescribed Paracetamol 500mg + ORS for 5 days.</div>
+            <div class="tags">
+              <span class="tag orange">Fever</span>
+              <span class="tag orange">Viral</span>
+              <span class="tag orange">Prescription Issued</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 2 -->
+        <div class="timeline-item">
+          <div class="icon-wrap red">❤️</div>
+          <div class="item-content">
+            <div class="item-date">10 Apr 2026</div>
+            <div class="item-title">BP Monitoring Check-in</div>
+            <div class="item-desc">Dr. Anita Kulkarni · BP: 128/84 — borderline. Advised low-sodium diet and light exercise. Follow-up in 3 weeks.</div>
+            <div class="tags">
+              <span class="tag red">Hypertension</span>
+              <span class="tag red">BP: 128/84</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 3 -->
+        <div class="timeline-item">
+          <div class="icon-wrap green">✏️</div>
+          <div class="item-content">
+            <div class="item-date">15 Mar 2026</div>
+            <div class="item-title">Blood Test Results Reviewed</div>
+            <div class="item-desc">Dr. Rajesh Singh · HbA1c: 6.1%, Fasting glucose: 108 mg/dL — pre-diabetic range. Lifestyle changes recommended.</div>
+            <div class="tags">
+              <span class="tag green">Diabetes Watch</span>
+              <span class="tag green">Lab Report</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 4 -->
+        <div class="timeline-item">
+          <div class="icon-wrap gray">📋</div>
+          <div class="item-content">
+            <div class="item-date">8 Feb 2026</div>
+            <div class="item-title">Chest X-Ray &amp; Lung Check</div>
+            <div class="item-desc">Dr. Vivek Sharma · Chest X-ray clear. No abnormalities detected. Mild seasonal allergy diagnosed. Antihistamine prescribed.</div>
+            <div class="tags">
+              <span class="tag">Allergy</span>
+              <span class="tag blue">X-Ray: Clear</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

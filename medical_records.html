@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medical Records</title>
+  <link rel="stylesheet" href="medical_records.css" />
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <div class="role active">
+      <h4>🩺 Doctor</h4>
+      <p>Manage patients</p>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">RS</div>
+      <div>
+        <h4>Dr. Rajesh Singh</h4>
+        <p>General Physician</p>
+      </div>
+    </div>
+
+    <nav>
+      <p class="section-title">MAIN</p>
+      <ul class="menu">
+        <a href="doctor_overview.html" class="menu-item">🏠 Overview</a>
+        <a href="doctor_consultation.html" class="menu-item">💬 Consultations</a>
+        <!-- <a href="doctor_appointment.html" class="menu-item">📅 Appointments</a> -->
+        <a href="doctor_patients.html" class="menu-item">👥 Patients</a>
+      </ul>
+
+      <p class="section-title">TOOLS</p>
+      <ul class="menu">
+        <a href="medical_records.html" class="menu-item active">📄 Records</a>
+       
+      </ul>
+    </nav>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Medical Records</h2>
+      <button class="upload-btn">Upload File</button>
+    </div>
+
+    <div class="content">
+
+      <!-- TABS -->
+      <div class="record-tabs">
+        <button class="tab active">All Files</button>
+        <button class="tab">Prescriptions</button>
+        <button class="tab">Lab Reports</button>
+        <button class="tab">Scans / X-rays</button>
+        <button class="tab">Discharge Notes</button>
+      </div>
+
+      <!-- UPLOAD BOX -->
+      <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+  <div class="upload-icon">📤</div>
+  <p><strong>Drop files here or click to upload</strong></p>
+  <span>PDF, JPG, PNG — encrypted & stored securely</span>
+
+  <!-- Hidden File Input -->
+  <input type="file" id="fileInput" multiple hidden />
+</div>
+      <!-- FILE CARDS -->
+      <div class="records-grid">
+
+        <div class="record-card">
+          <div class="record-top blue">📄</div>
+          <div class="record-body">
+            <h4>Prescription_Apr2026.pdf</h4>
+            <span class="tag blue-tag">Prescription</span>
+            <div class="record-footer">
+              <span>23 Apr 2026</span>
+              <div>
+                <button class="btn primary">View</button>
+                <button class="btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top green">🧪</div>
+          <div class="record-body">
+            <h4>Blood_Report_Mar2026.pdf</h4>
+            <span class="tag green-tag">Lab Report</span>
+            <div class="record-footer">
+              <span>15 Mar 2026</span>
+              <div>
+                <button class="btn primary">View</button>
+                <button class="btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top purple">🫁</div>
+          <div class="record-body">
+            <h4>Chest_Xray_Feb2026.jpg</h4>
+            <span class="tag purple-tag">Scan</span>
+            <div class="record-footer">
+              <span>8 Feb 2026</span>
+              <div>
+                <button class="btn primary">View</button>
+                <button class="btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top yellow">📄</div>
+          <div class="record-body">
+            <h4>Discharge_Note_Jan2026.pdf</h4>
+            <span class="tag yellow-tag">Discharge</span>
+            <div class="record-footer">
+              <span>20 Jan 2026</span>
+              <div>
+                <button class="btn primary">View</button>
+                <button class="btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+</body>
+</html>
+
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const grid = document.querySelector(".records-grid");
+
+fileInput.addEventListener("change", function () {
+  const files = fileInput.files;
+
+  for (let file of files) {
+    const fileName = file.name;
+    const date = new Date().toLocaleDateString();
+
+    // Create new card dynamically
+    const card = document.createElement("div");
+    card.className = "record-card";
+
+    card.innerHTML = `
+      <div class="record-top blue">📄</div>
+      <div class="record-body">
+        <h4>${fileName}</h4>
+        <span class="tag blue-tag">Uploaded</span>
+        <div class="record-footer">
+          <span>${date}</span>
+          <div>
+            <button class="btn primary">View</button>
+            <button class="btn">Share</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    grid.prepend(card);
+  }
+});
+</script>
+
+<script>
+const uploadBox = document.querySelector(".upload-box");
+
+uploadBox.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadBox.style.borderColor = "#2bb3c0";
+});
+
+uploadBox.addEventListener("dragleave", () => {
+  uploadBox.style.borderColor = "#cde7ec";
+});
+
+uploadBox.addEventListener("drop", (e) => {
+  e.preventDefault();
+  fileInput.files = e.dataTransfer.files;
+  fileInput.dispatchEvent(new Event("change"));
+});
+</script>

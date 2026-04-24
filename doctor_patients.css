@@ -1,0 +1,382 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: #f4f7fb;
+  overflow: hidden;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #0f1b2d, #0a1424);
+  color: #cbd5e1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: #2bb3c0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logo h2 {
+  color: white;
+}
+
+.logo p {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Sections */
+.section-title {
+  font-size: 12px;
+  margin: 15px 0 10px;
+  opacity: 0.6;
+}
+
+/* Role */
+.role {
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2bb3c0, #2d9cdb);
+  color: white;
+  text-align: center;
+}
+
+/* Profile */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #2bb3c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Menu */
+.menu {
+  list-style: none;
+}
+
+.menu-item {
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.menu-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+.menu-item.active {
+  background: rgba(45,156,219,0.2);
+  color: #2bb3c0;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* HEADER */
+.header {
+  height: 70px;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e6ed;
+}
+
+.menu-toggle {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* CONTENT */
+.content {
+  padding: 20px;
+}
+
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+}
+
+.number {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2bb3c0;
+}
+
+/* PANEL */
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    transition: 0.3s;
+    z-index: 1000;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+}
+
+.menu a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* =========================
+   PATIENT TABLE DESIGN
+========================= */
+
+.patients-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e6edf3;
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-header h3 {
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.card-header span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Table */
+.patients-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table Head */
+.patients-card th {
+  text-align: left;
+  padding: 14px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Table Body */
+.patients-card td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #334155;
+}
+
+/* Hover Effect */
+.patients-card tr:hover {
+  background: #f8fafc;
+  transition: 0.2s ease;
+}
+
+/* Patient Info */
+.patient-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Avatar */
+.patient-info .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Avatar Colors */
+.blue { background: linear-gradient(135deg, #2bb3c0, #2d9cdb); }
+.purple { background: linear-gradient(135deg, #7b4ce2, #9b5de5); }
+.orange { background: linear-gradient(135deg, #ff8c42, #ff6b35); }
+.green { background: linear-gradient(135deg, #1ca97c, #159f6b); }
+.red { background: linear-gradient(135deg, #ff4d4d, #e63946); }
+
+/* Name + Village */
+.patient-info strong {
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.patient-info p {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Risk Badges */
+.badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Badge Colors */
+.low {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.chronic {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+/* Button */
+.btn {
+  background: linear-gradient(135deg, #2bb3c0, #2d9cdb);
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+/* Hover */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(45, 156, 219, 0.3);
+}
+
+/* Click */
+.btn:active {
+  transform: scale(0.95);
+}
+.search {
+  padding: 10px 14px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  background: #f9fbfd;
+  transition: all 0.25s ease;
+  width: 220px;
+}
+
+/* Placeholder styling */
+.search::placeholder {
+  color: #9aa5b1;
+}
+
+/* Focus effect */
+.search:focus {
+  border-color: #2bb3c0;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(43, 179, 192, 0.1);
+}
+
+/* Hover effect */
+.search:hover {
+  border-color: #2bb3c0;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

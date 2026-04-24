@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medical Records</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:       #e07b39;
+      --accent-hover: #c96828;
+      --accent-light: #fff7f2;
+      --bg:           #f4f4f2;
+      --surface:      #ffffff;
+      --border:       #e2e2de;
+      --text:         #1a1a1a;
+      --muted:        #6b6b6b;
+      --sidebar-bg:   #1a1f2e;
+      --sidebar-muted:#5a6070;
+      --sidebar-text: #c8cdd8;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column; gap: 18px;
+      padding: 20px 14px;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--accent); color: #fff;
+      font-size: 1.3rem; font-weight: 700;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo h2 { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .logo p  { font-size: 0.58rem; color: var(--sidebar-muted); letter-spacing: .8px; margin-top: 1px; }
+
+    /* Section label */
+    .section-title {
+      font-size: 0.60rem; font-weight: 700;
+      letter-spacing: 1px; color: var(--sidebar-muted);
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+
+    /* VIEW AS — two role cards side by side */
+    .role-switch { display: flex; gap: 8px; }
+    .role-card {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 5px;
+      padding: 14px 8px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #252b3b;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .role-card.active { background: #e07b39; }
+    .role-card:not(.active):hover { background: #2e3547; }
+    .role-card .role-emoji {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+    .role-card.active .role-emoji { background: rgba(255,255,255,0.20); }
+    .role-card h4 { font-size: 0.80rem; font-weight: 700; color: #ffffff; text-align: center; margin-top: 2px; }
+    .role-card p  { font-size: 0.60rem; color: rgba(255,255,255,0.60); text-align: center; line-height: 1.4; }
+    .role-card.active p { color: rgba(255,255,255,0.85); }
+
+    /* Profile */
+    .profile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .avatar {
+      width: 34px; height: 34px;
+      background: var(--accent); color: #fff;
+      font-size: 0.78rem; font-weight: 700;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .profile h4 { font-size: 0.84rem; font-weight: 600; color: #fff; }
+    .profile p  { font-size: 0.70rem; color: var(--sidebar-muted); margin-top: 1px; }
+
+    /* Nav */
+    .menu { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+    .menu-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 10px; border-radius: 7px;
+      font-size: 0.82rem; color: var(--sidebar-text);
+      cursor: pointer;
+      transition: background .16s, color .16s;
+      font-weight: 500;
+      position: relative;
+    }
+    .menu-item:hover  { background: rgba(255,255,255,0.07); color: #fff; }
+    .menu-item.active {
+      background: rgba(224,123,57,0.15);
+      color: var(--accent);
+      font-weight: 600;
+      border-left: 2px solid var(--accent);
+      padding-left: 8px;
+    }
+    .menu-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .badge-dot {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      min-width: 18px; height: 18px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 4px;
+    }
+
+    /* ── Main ── */
+    .app { flex: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px; }
+
+    /* ── Header ── */
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .title    { font-size: 1.6rem; font-weight: 700; letter-spacing: -.3px; }
+    .subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .btn-upload {
+      background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background .2s, transform .15s;
+    }
+    .btn-upload:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tab {
+      background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
+      padding: 6px 16px; font-size: 0.83rem; font-weight: 500; color: var(--muted);
+      cursor: pointer; transition: all .18s;
+    }
+    .tab:hover  { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+    /* ── Dropzone ── */
+    .dropzone {
+      background: #fff7f2; border: 2px dashed #e8b48a; border-radius: 16px;
+      padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      cursor: pointer; transition: background .2s, border-color .2s;
+    }
+    .dropzone:hover, .dropzone.drag-over { background: #fef0e6; border-color: var(--accent); }
+    .dropzone-text { font-size: .9rem; font-weight: 600; }
+    .dropzone-hint { font-size: .78rem; color: var(--muted); }
+
+    /* ── Grid ── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 20px; }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state div { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface); border-radius: 16px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+      transition: box-shadow .22s, transform .22s;
+      display: flex; flex-direction: column;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1), 0 8px 32px rgba(0,0,0,.07); transform: translateY(-3px); }
+    .card-preview { height: 120px; display: flex; align-items: center; justify-content: center; }
+    .card-preview--blue   { background: #dce8f5; }
+    .card-preview--green  { background: #d6f0e0; }
+    .card-preview--purple { background: #ede0f8; }
+    .card-preview--yellow { background: #fef3d0; }
+    .card-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .card-name { font-size: .86rem; font-weight: 600; word-break: break-word; }
+    .card-tags { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .card-date { font-size: .74rem; color: var(--muted); white-space: nowrap; }
+    .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: .70rem; font-weight: 600; }
+    .badge--prescription { background: #dce8f5; color: #2c6fad; }
+    .badge--lab          { background: #d6f0e0; color: #1f7a45; }
+    .badge--scan         { background: #ede0f8; color: #7040b0; }
+    .badge--discharge    { background: #fef3d0; color: #a07010; }
+    .card-actions { display: flex; gap: 8px; margin-top: 2px; }
+    .btn-view, .btn-share, .btn-delete {
+      border-radius: 6px; padding: 8px 0; font-size: .84rem; font-weight: 600;
+      cursor: pointer; transition: all .18s; border: none;
+    }
+    .btn-view  { flex: 1; background: var(--accent); color: #fff; }
+    .btn-view:hover { background: var(--accent-hover); }
+    .btn-share { flex: 1; background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-share:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .btn-delete { flex: 0; padding: 8px 10px; background: transparent; color: #cc4444; border: 1.5px solid var(--border); }
+    .btn-delete:hover { background: #fff0f0; border-color: #cc4444; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 1000;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 16px; width: 100%; max-width: 620px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.2); animation: slideUp .25s ease; overflow: hidden;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-header h3 { font-size: .95rem; font-weight: 700; word-break: break-all; }
+    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 4px; transition: background .15s; }
+    .modal-close:hover { background: #f0f0f0; }
+    .modal-body { padding: 20px; }
+    .modal-body img, .modal-body iframe { max-width: 100%; border-radius: 8px; display: block; margin: 0 auto; }
+    .modal-body iframe { width: 100%; height: 60vh; border: none; }
+
+    .share-box { max-width: 420px; }
+    .share-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .btn-copy   { padding: 10px 16px; border-radius: 8px; background: var(--accent); color: #fff; border: none; font-size: .88rem; font-weight: 600; cursor: pointer; }
+    .btn-cancel { padding: 10px 16px; border-radius: 8px; background: transparent; color: var(--muted); border: 1.5px solid var(--border); font-size: .88rem; font-weight: 600; cursor: pointer; }
+
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1f2e; color: #fff;
+      padding: 12px 20px; border-radius: 8px;
+      font-size: .85rem; font-weight: 600; z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      animation: slideUp .3s ease;
+    }
+    .toast.error { background: #cc4444; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media(max-width:700px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .app { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .btn-upload { width: 100%; justify-content: center; }
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+    .role-switch .role-card:not(.active) {
+    display: none;
+}
+.role-switch .role-card.active {
+    padding: 12px 4px; /* reduce from original */
+}
+/* Remove underline from links */
+.menu-item {
+    text-decoration: none;
+}
+
+/* Remove any list styling (bullets/lines) */
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Remove any borders or separators */
+.menu li {
+    border: none;
+}
+
+/* Optional: ensure no outline/line on hover or focus */
+.menu-item:hover,
+.menu-item:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div>
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <!-- VIEW AS -->
+    <div>
+      <p class="section-title">VIEW AS</p>
+      <div class="role-switch">
+        <div class="role-card">
+          <div class="role-emoji">
+            <!-- Stethoscope SVG -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.90)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3a1 1 0 0 0-1 1v5a5 5 0 0 0 10 0V4a1 1 0 0 0-1-1"/>
+              <path d="M11 14v3a4 4 0 0 0 8 0v-2"/>
+              <circle cx="19" cy="15" r="1.5" fill="rgba(255,255,255,0.90)" stroke="none"/>
+              <line x1="6" y1="3" x2="6" y2="3"/>
+              <line x1="10" y1="3" x2="10" y2="3"/>
+            </svg>
+          </div>
+          <h4>Doctor</h4>
+          <p>Manage patients &amp; consults</p>
+        </div>
+        <div class="role-card active">
+          <div class="role-emoji">
+            <!-- Person/Patient SVG -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="7" r="4"/>
+              <path d="M5.5 21c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/>
+            </svg>
+          </div>
+          <h4>Patient</h4>
+          <p>Book &amp; track health</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="profile">
+      <div class="avatar">PD</div>
+      <div>
+        <h4>Priya Devi</h4>
+        <p>Patient · Nandgaon</p>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+            <p class="section-title">MY CARE</p>
+            <ul class="menu">
+                <li><a href="patient_overview.html" class="menu-item" onclick="navigateTo(event, 'home')"><span class="menu-icon">🏠</span> Home</a></li>
+                <li><a href="book_appointment.html" class="menu-item" onclick="navigateTo(event, 'appointment')"><span class="menu-icon">📅</span> Book Appointment</a></li>
+                <li><a href="chat_with_doctor.html" class="menu-item" onclick="navigateTo(event, 'chat')"><span class="menu-icon">💬</span> Chat with Doctor </a></li>
+                <li><a href="symptom_checker.html" class="menu-item" onclick="navigateTo(event, 'symptom')"><span class="menu-icon">🩺</span> Symptom Checker</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="section-title">RECORDS</p>
+            <ul class="menu">
+                <li><a href="health_records.html" class="menu-item" onclick="navigateTo(event, 'health-records')"><span class="menu-icon">📄</span> Health Records</a></li>
+                <li><a href="upload_documents.html" class="menu-item active" onclick="navigateTo(event, 'upload')"><span class="menu-icon">📤</span> Upload Documents</a></li>
+            </ul>
+        </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="app">
+
+    <header class="header">
+      <div>
+        <h1 class="title">Medical Records</h1>
+        <p class="subtitle">Upload · View · Share documents securely</p>
+      </div>
+      <button class="btn-upload" id="uploadBtn">⬆ Upload File</button>
+    </header>
+
+    <div class="tabs" id="tabBar">
+      <button class="tab active">All Files</button>
+      <button class="tab">Prescriptions</button>
+      <button class="tab">Lab Reports</button>
+      <button class="tab">Scans / X-rays</button>
+      <button class="tab">Discharge Notes</button>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect x="10" y="20" width="20" height="14" rx="3" fill="#e07b39" opacity="0.2"/>
+        <rect x="10" y="20" width="20" height="14" rx="3" stroke="#e07b39" stroke-width="1.5"/>
+        <path d="M20 6L20 22M14 12L20 6L26 12" stroke="#e07b39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="dropzone-text">Drop files here or click to upload</p>
+      <p class="dropzone-hint">PDF, JPG, PNG — encrypted &amp; stored securely</p>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid"></div>
+
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="viewTitle">Preview</h3>
+      <button class="modal-close" data-close="viewModal">✕</button>
+    </div>
+    <div class="modal-body" id="viewBody"></div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal-box share-box">
+    <div class="modal-header">
+      <h3>Share File</h3>
+      <button class="modal-close" data-close="shareModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.85rem;color:#6b6b6b;">Sharing: <strong id="shareFileName"></strong></p>
+      <div class="share-actions">
+        <button class="btn-copy" id="copyLinkBtn">🔗 Copy Shareable Link</button>
+        <button class="btn-cancel" data-close="shareModal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let files = [
+  { id:1, name:'Prescription_Apr2026.pdf',  type:'Prescription', date:'23 Apr 2026', color:'blue',   badge:'prescription', dataUrl:null },
+  { id:2, name:'Blood_Report_Mar2026.pdf',   type:'Lab Report',   date:'15 Mar 2026', color:'green',  badge:'lab',          dataUrl:null },
+  { id:3, name:'Chest_Xray_Feb2026.jpg',     type:'Scan',         date:'8 Feb 2026',  color:'purple', badge:'scan',         dataUrl:null },
+  { id:4, name:'Discharge_Note_Jan2026.pdf', type:'Discharge',    date:'20 Jan 2026', color:'yellow', badge:'discharge',    dataUrl:null }
+];
+let activeFilter = 'All Files';
+let shareFileId  = null;
+let uid = 5;
+
+function svgIcon(color) {
+  const icons = {
+    blue: `<svg width="48" height="60" viewBox="0 0 48 60" fill="none">
+      <rect x="6" y="4" width="36" height="52" rx="4" fill="#fff" stroke="#b8cce4" stroke-width="1.5"/>
+      <line x1="14" y1="18" x2="34" y2="18" stroke="#b8cce4" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="14" y1="26" x2="34" y2="26" stroke="#b8cce4" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="14" y1="34" x2="26" y2="34" stroke="#b8cce4" stroke-width="1.5" stroke-linecap="round"/>
+      <rect x="8" y="8" width="10" height="6" rx="1.5" fill="#b8cce4" opacity="0.5"/>
+    </svg>`,
+    green: `<svg width="48" height="60" viewBox="0 0 48 60" fill="none">
+      <rect x="18" y="4" width="12" height="18" rx="3" fill="#fff" stroke="#82c8a0" stroke-width="1.5"/>
+      <path d="M14 22 Q8 34 10 46 Q12 54 24 54 Q36 54 38 46 Q40 34 34 22" fill="#fff" stroke="#82c8a0" stroke-width="1.5"/>
+      <circle cx="20" cy="38" r="3" fill="#82c8a0" opacity="0.5"/>
+      <circle cx="28" cy="44" r="2" fill="#82c8a0" opacity="0.3"/>
+    </svg>`,
+    purple: `<svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+      <rect x="4" y="4" width="36" height="48" rx="4" fill="#fff" stroke="#c4aee0" stroke-width="1.5"/>
+      <rect x="10" y="10" width="24" height="36" rx="2" fill="#e8e0f4"/>
+      <line x1="22" y1="14" x2="22" y2="42" stroke="#c4aee0" stroke-width="1" stroke-dasharray="2 2"/>
+    </svg>`,
+    yellow: `<svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+      <rect x="4" y="4" width="36" height="48" rx="4" fill="#fff" stroke="#d4b96a" stroke-width="1.5"/>
+      <line x1="12" y1="18" x2="32" y2="18" stroke="#d4b96a" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="12" y1="26" x2="32" y2="26" stroke="#d4b96a" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="12" y1="34" x2="24" y2="34" stroke="#d4b96a" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="34" cy="38" r="6" fill="#d4b96a" opacity="0.2" stroke="#d4b96a" stroke-width="1"/>
+      <path d="M31 38 L33 40 L37 36" stroke="#d4b96a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`
+  };
+  return icons[color] || icons.blue;
+}
+
+function render() {
+  const grid = document.getElementById('cardsGrid');
+  const filterMap = {
+    'All Files':'', 'Prescriptions':'Prescription',
+    'Lab Reports':'Lab Report', 'Scans / X-rays':'Scan', 'Discharge Notes':'Discharge'
+  };
+  const want = filterMap[activeFilter];
+  const list = want ? files.filter(f => f.type === want) : files;
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><div>📂</div><p>No files in this category.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(f => {
+    const isImg = f.dataUrl && f.dataUrl.startsWith('data:image');
+    const preview = isImg ? `<img src="${f.dataUrl}" alt="${f.name}">` : svgIcon(f.color);
+    return `
+      <div class="card" data-id="${f.id}">
+        <div class="card-preview card-preview--${f.color}" style="${isImg?'padding:0;overflow:hidden;height:120px;':''}">
+          ${preview}
+        </div>
+        <div class="card-body">
+          <span class="card-name">${f.name}</span>
+          <div class="card-tags">
+            <span class="badge badge--${f.badge}">${f.type}</span>
+            <span class="card-date">${f.date}</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn-view"   data-id="${f.id}">View</button>
+            <button class="btn-share"  data-id="${f.id}">Share</button>
+            <button class="btn-delete" data-id="${f.id}">🗑</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function colorFor(mime) {
+  if (mime.includes('image')) return {color:'purple', badge:'scan', type:'Scan'};
+  const opts = [
+    {color:'blue',  badge:'prescription', type:'Prescription'},
+    {color:'green', badge:'lab',          type:'Lab Report'},
+    {color:'yellow',badge:'discharge',    type:'Discharge'}
+  ];
+  return opts[Math.floor(Math.random()*opts.length)];
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function handleFiles(fileList) {
+  const allowed = ['application/pdf','image/jpeg','image/png','image/jpg'];
+  let queued=0, done=0;
+  Array.from(fileList).forEach(file => {
+    if (!allowed.includes(file.type)) { toast(`❌ Unsupported: ${file.name}`, true); return; }
+    queued++;
+    const r = new FileReader();
+    r.onload = e => {
+      const meta = colorFor(file.type);
+      files.unshift({ id:uid++, name:file.name, date:formatDate(new Date()), dataUrl:e.target.result, ...meta });
+      done++;
+      render();
+      if (done===queued) toast(`✅ ${done} file(s) uploaded!`);
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function openPicker() {
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='.pdf,.jpg,.jpeg,.png'; inp.multiple=true;
+  inp.onchange = e => { if(e.target.files.length) handleFiles(e.target.files); };
+  inp.click();
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open');    document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+
+function viewFile(id) {
+  const f = files.find(x=>x.id===id);
+  if (!f) return;
+  document.getElementById('viewTitle').textContent = f.name;
+  const body = document.getElementById('viewBody');
+  if (f.dataUrl) {
+    if (f.dataUrl.startsWith('data:image')) {
+      body.innerHTML = `<img src="${f.dataUrl}" alt="${f.name}" style="max-height:65vh;object-fit:contain;">`;
+    } else {
+      body.innerHTML = `<iframe src="${f.dataUrl}"></iframe>`;
+    }
+  } else {
+    body.innerHTML = `<div style="text-align:center;padding:40px 0;">
+      ${svgIcon(f.color)}
+      <p style="color:#6b6b6b;margin-top:16px;font-size:.9rem;">This is a sample record. Upload a real file to preview it.</p>
+    </div>`;
+  }
+  openModal('viewModal');
+}
+
+function shareFile(id) {
+  const f = files.find(x=>x.id===id);
+  if (!f) return;
+  shareFileId = id;
+  document.getElementById('shareFileName').textContent = f.name;
+  openModal('shareModal');
+}
+
+function toast(msg, isErr=false) {
+  document.querySelector('.toast')?.remove();
+  const t = document.createElement('div');
+  t.className = 'toast' + (isErr?' error':'');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+
+document.getElementById('cardsGrid').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const id = +btn.dataset.id;
+  if (btn.classList.contains('btn-view'))   viewFile(id);
+  if (btn.classList.contains('btn-share'))  shareFile(id);
+  if (btn.classList.contains('btn-delete')) {
+    if (confirm('Delete this file?')) {
+      files = files.filter(f=>f.id!==id);
+      render();
+      toast('🗑 File deleted.');
+    }
+  }
+});
+
+document.getElementById('tabBar').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  activeFilter = tab.textContent.trim();
+  render();
+});
+
+const dz = document.getElementById('dropzone');
+dz.addEventListener('click', openPicker);
+dz.addEventListener('dragover',  e=>{ e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', ()=> dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('drag-over');
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+document.getElementById('uploadBtn').addEventListener('click', openPicker);
+
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', ()=> closeModal(btn.dataset.close));
+});
+
+['viewModal','shareModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') { closeModal('viewModal'); closeModal('shareModal'); }
+});
+
+document.getElementById('copyLinkBtn').addEventListener('click', ()=>{
+  const link = `https://ruralcare.app/records/${shareFileId}`;
+  navigator.clipboard.writeText(link)
+    .then(()=> toast('🔗 Link copied!'))
+    .catch(()=> toast('🔗 ' + link));
+  closeModal('shareModal');
+});
+
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.role-card').forEach(card => {
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+
+render();
+</script>
+</body>
+</html>

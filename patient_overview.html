@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RuralCare – Patient Dashboard</title>
+  <style>
+    /* RESET */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+    body { background: #f5f7fb; color: #333; }
+
+    /* LAYOUT */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px; min-width: 260px;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 24px 16px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+
+    /* Logo */
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .logo-icon {
+      background: #f97316; width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; font-size: 22px; font-weight: bold; color: #fff;
+    }
+    .logo-text h2 { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; }
+    .logo-text p { font-size: 10px; color: #94a3b8; letter-spacing: 1px; }
+
+    /* View As */
+    .section-label { font-size: 11px; color: #64748b; letter-spacing: 1.2px; font-weight: 600; margin: 18px 0 10px 4px; }
+
+    .role-box {
+      background: #f97316;
+      border-radius: 12px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .role-icon {
+      width: 38px; height: 38px; background: rgba(255,255,255,0.2);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .role-box h4 { font-size: 14px; font-weight: 700; }
+    .role-box p  { font-size: 11px; color: rgba(255,255,255,0.8); }
+
+    /* Profile */
+    .profile {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 12px 14px; margin: 16px 0 8px;
+    }
+    .avatar {
+      width: 40px; height: 40px; background: #f97316;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+    }
+    .profile h4 { font-size: 14px; font-weight: 600; }
+    .profile p  { font-size: 12px; color: #f97316; }
+
+    /* Nav */
+    nav { margin-top: 6px; flex: 1; }
+    .menu { list-style: none; margin-bottom: 4px; }
+    .menu li a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 9px;
+      color: #cbd5e1; font-size: 13.5px; font-weight: 500;
+      text-decoration: none; transition: background 0.18s, color 0.18s;
+      margin-bottom: 2px;
+    }
+    .menu li a:hover { background: #334155; color: #fff; }
+    /* .menu li.active a { background: #f97316 !important; color: #fff !important; } */
+    .menu li a .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+    /* Sidebar settings at bottom */
+    .sidebar-footer { margin-top: auto; padding-top: 12px; }
+    .sidebar-footer a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 9px;
+      color: #64748b; font-size: 13.5px; text-decoration: none;
+      transition: background 0.18s;
+    }
+    .sidebar-footer a:hover { background: #334155; color: #fff; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 32px 36px; overflow-y: auto; }
+
+    /* Top bar */
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+    .topbar-left h1 { font-size: 28px; font-weight: 700; color: #0f172a; }
+    .topbar-left p  { font-size: 13px; color: #94a3b8; margin-top: 3px; }
+    .topbar-right { display: flex; gap: 12px; align-items: center; }
+    .btn-outline {
+      border: 1.5px solid #cbd5e1; background: #fff;
+      padding: 9px 18px; border-radius: 9px; font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      color: #334155; font-weight: 500;
+    }
+    .btn-primary {
+      background: #f97316; color: #fff; border: none;
+      padding: 10px 22px; border-radius: 9px; font-size: 13px;
+      cursor: pointer; font-weight: 600;
+    }
+
+    /* Dashboard banner */
+    .banner {
+      background: #fef3e8; border-radius: 14px;
+      padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 16px;
+    }
+    .banner-left { display: flex; align-items: center; gap: 16px; }
+    .banner-avatar {
+      width: 50px; height: 50px; background: #fddbb4; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .banner h3 { color: #f97316; font-size: 16px; font-weight: 700; }
+    .banner p  { font-size: 13px; color: #78716c; margin-top: 3px; }
+    .banner-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tag-btn {
+      border: 1.5px solid #e2e8f0; background: #fff;
+      padding: 6px 14px; border-radius: 20px; font-size: 12px;
+      cursor: pointer; color: #334155; white-space: nowrap;
+    }
+
+    /* Stats cards */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: #fff; border-radius: 14px;
+      padding: 20px 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::after {
+      content: ''; position: absolute; top: -20px; right: -20px;
+      width: 70px; height: 70px; border-radius: 50%;
+      background: rgba(249,115,22,0.08);
+    }
+    .stat-label { font-size: 11px; color: #94a3b8; letter-spacing: 1px; font-weight: 600; margin-bottom: 10px; }
+    .stat-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+    .stat-number { font-size: 32px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .stat-sub { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+    /* Bottom row */
+    .bottom-row { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+
+    /* Appointments panel */
+    .panel { background: #fff; border-radius: 14px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .panel-header h3 { font-size: 15px; font-weight: 700; }
+    .btn-sm { border: 1.5px solid #e2e8f0; background: #fff; padding: 6px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+
+    .appt-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+    .appt-item:last-child { border-bottom: none; }
+    .appt-avatar {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+    }
+    .av-blue  { background: #0ea5e9; }
+    .av-purple{ background: #8b5cf6; }
+    .av-green { background: #10b981; }
+    .appt-info { flex: 1; }
+    .appt-info h4 { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .appt-info p  { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .appt-right { text-align: right; }
+    .appt-right .time { font-size: 13px; font-weight: 600; color: #0f172a; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; margin-top: 4px;
+    }
+    .badge-orange { background: #fff7ed; color: #f97316; }
+    .badge-green  { background: #ecfdf5; color: #059669; }
+    .badge-gray   { background: #f1f5f9; color: #64748b; }
+
+    /* Quick Actions */
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+    .qa-card {
+      border: 1.5px solid #f1f5f9; border-radius: 12px;
+      padding: 14px 12px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    .qa-card:hover { border-color: #f97316; box-shadow: 0 2px 12px rgba(249,115,22,0.12); }
+    .qa-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+    .qa-card h4 { font-size: 13px; font-weight: 600; color: #0f172a; }
+    .qa-card p  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .bottom-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .main { padding: 20px 16px; }
+      .sidebar { width: 220px; min-width: 220px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div class="logo-text">
+        <h2>RuralCare</h2>
+        <p>TELEMEDICINE PORTAL</p>
+      </div>
+    </div>
+
+    <p class="section-label">VIEW AS</p>
+    <div class="role-box">
+      <div class="role-icon">🧑‍⚕️</div>
+      <div>
+        <h4>Patient</h4>
+        <p>Book &amp; track health</p>
+      </div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">PD</div>
+      <div>
+        <h4>Priya Devi</h4>
+        <p>Patient · Nandgaon</p>
+      </div>
+    </div>
+
+    <nav>
+      <p class="section-label">MY CARE</p>
+      <ul class="menu">
+        <li class="active"><a href="patient_overview.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="book_appointment.html"><span class="nav-icon">📅</span> Book Appointment</a></li>
+        <li><a href="chat_with_doctor.html"><span class="nav-icon">💬</span> Chat with Doctor</a></li>
+        <li><a href="symptom_checker.html"><span class="nav-icon">🩺</span> Symptom Checker</a></li>
+      </ul>
+
+      <p class="section-label">RECORDS</p>
+      <ul class="menu">
+        <li><a href="health_records.html"><span class="nav-icon">📄</span> Health Records</a></li>
+        <li><a href="upload_documents.html"><span class="nav-icon">📤</span> Upload Documents</a></li>
+        
+      </ul>
+    </nav>
+
+
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Hello, Priya 👋</h1>
+        <p>Thursday, 24 April 2026 &nbsp;·&nbsp; Your next appointment is tomorrow</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-outline">🔍 Check Symptoms</button>
+        <button class="btn-primary">Book Appointment</button>
+      </div>
+    </div>
+
+    <!-- Banner -->
+    <div class="banner">
+      <div class="banner-left">
+        <div class="banner-avatar">🧑</div>
+        <div>
+          <h3>Patient Dashboard</h3>
+          <p>Book appointments, check symptoms, and manage your personal health records</p>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <button class="tag-btn">Book Slots</button>
+        <button class="tag-btn">Symptom Checker</button>
+        <button class="tag-btn">My Records</button>
+        <button class="tag-btn">Reminders</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-icon">📅</span>
+        <div class="stat-label">UPCOMING APPOINTMENTS</div>
+        <div class="stat-number">2</div>
+        <div class="stat-sub">Next: 24 Apr, 11:00 AM</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💬</span>
+        <div class="stat-label">ACTIVE CHATS</div>
+        <div class="stat-number">1</div>
+        <div class="stat-sub">1 unread reply</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📋</span>
+        <div class="stat-label">MY PRESCRIPTIONS</div>
+        <div class="stat-number">3</div>
+        <div class="stat-sub">1 needs renewal</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🔔</span>
+        <div class="stat-label">PENDING REMINDERS</div>
+        <div class="stat-number">3</div>
+        <div class="stat-sub">Medication alerts</div>
+      </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="bottom-row">
+
+      <!-- Appointments -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>My Appointments</h3>
+          <button class="btn-sm">Book New</button>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-avatar av-blue">RS</div>
+          <div class="appt-info">
+            <h4>Dr. Rajesh Singh</h4>
+            <p>General Physician · Diabetes Follow-up</p>
+          </div>
+          <div class="appt-right">
+            <div class="time">Tomorrow, 11 AM</div>
+            <span class="badge badge-orange">Upcoming</span>
+          </div>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-avatar av-purple">AK</div>
+          <div class="appt-info">
+            <h4>Dr. Anita Kulkarni</h4>
+            <p>Cardiologist · BP Monitoring</p>
+          </div>
+          <div class="appt-right">
+            <div class="time">28 Apr, 3 PM</div>
+            <span class="badge badge-green">Confirmed</span>
+          </div>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-avatar av-green">VS</div>
+          <div class="appt-info">
+            <h4>Dr. Vivek Sharma</h4>
+            <p>Last visit: 10 Apr · Routine Checkup</p>
+          </div>
+          <div class="appt-right">
+            <div class="time">10 Apr</div>
+            <span class="badge badge-gray">Completed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Patient Quick Actions</h3>
+        </div>
+        <div class="quick-grid">
+          <a class="qa-card" href="book_appointment.html">
+            <span class="qa-icon">📅</span>
+            <h4>Book Slot</h4>
+            <p>Choose doctor</p>
+          </a>
+          <a class="qa-card" href="symptom_checker.html">
+            <span class="qa-icon">🔍</span>
+            <h4>Check Symptoms</h4>
+            <p>AI-assisted</p>
+          </a>
+          <a class="qa-card" href="upload_documents.html">
+            <span class="qa-icon">📤</span>
+            <h4>Upload Report</h4>
+            <p>Lab / scans</p>
+          </a>
+          <a class="qa-card" href="health_records.html">
+            <span class="qa-icon">🕐</span>
+            <h4>My History</h4>
+            <p>Past visits</p>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
